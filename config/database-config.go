@@ -34,7 +34,7 @@ func SetupDB() *gorm.DB {
 }
 
 // CloseDB is CloseDB :))
-func CloseDB(db *grom.DB) {
+func CloseDB(db *gorm.DB) {
 	db2, err := db.DB()
 
 	if err != nil {
