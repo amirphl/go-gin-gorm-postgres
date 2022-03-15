@@ -13,9 +13,8 @@ import (
 var (
 	db             *gorm.DB                  = config.SetupDB()
 	userRepo       repository.UserRepository = repository.CreateUserRepo(db)
-	authSer        service.AuthService       = service.CreateAuthService(userRepo)
 	jwtSer         service.JWTService        = service.CreateJWTService()
-	authController controller.AuthController = controller.CreateAuthController(authSer, jwtSer)
+	authController controller.AuthController = controller.CreateAuthController(userRepo, jwtSer)
 )
 
 func main() {
