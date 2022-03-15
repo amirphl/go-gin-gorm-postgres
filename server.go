@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/amirphl/go-gin-gorm-postgres/config"
 	"github.com/amirphl/go-gin-gorm-postgres/controller"
-	// "github.com/amirphl/go-gin-gorm-postgres/middleware"
+	"github.com/amirphl/go-gin-gorm-postgres/middleware"
 	"github.com/amirphl/go-gin-gorm-postgres/repository"
 	"github.com/amirphl/go-gin-gorm-postgres/service"
 	"github.com/gin-gonic/gin"
@@ -15,6 +15,7 @@ var (
 	userRepo       repository.UserRepository = repository.CreateUserRepo(db)
 	jwtSer         service.JWTService        = service.CreateJWTService()
 	authController controller.AuthController = controller.CreateAuthController(userRepo, jwtSer)
+	userController controller.UserController = controller.CreateUserController(userRepo, jwtSer)
 )
 
 func main() {
@@ -22,12 +23,18 @@ func main() {
 
 	r := gin.Default()
 
-	authRoutes := r.Group("api/v1/auth")
-	// authRoutes := r.Group("api/v1/auth", middleware.AuthorizeJWT(jwtSer))
-	// This is just a block!
+	allRoutes := r.Group("api/v1")
 	{
-		authRoutes.POST("/login", authController.Login)
-		authRoutes.POST("/register", authController.Register)
+		authRoutes := allRoutes.Group("/auth")
+		{
+			authRoutes.POST("/login", authController.Login)
+			authRoutes.POST("/register", authController.Register)
+		}
+		protectedUserRoutes := allRoutes.Group("/users", middleware.AuthorizeJWT(jwtSer))
+		{
+			protectedUserRoutes.PUT("/:id", userController.UpdateUser)
+			protectedUserRoutes.GET("/:id", userController.GetUser)
+		}
 	}
 
 	r.Run()
