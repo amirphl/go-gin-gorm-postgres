@@ -9,7 +9,7 @@ import (
 
 // UserRepository ...
 type UserRepository interface {
-	Insert(user entity.User) entity.User
+	Create(user entity.User) entity.User
 	Update(user entity.User) entity.User
 	VerifyCredential(email string, password string) interface{}
 	FindByEmail(email string) interface{}
@@ -26,8 +26,8 @@ func CreateUserRepo(db *gorm.DB) UserRepository {
 }
 
 // `user.Password` must be a plain password if set!
-func (u *userConnection) Insert(user entity.User) entity.User {
-	log.Printf("before Insert: %v\n", user)
+func (u *userConnection) Create(user entity.User) entity.User {
+	log.Printf("before Create: %v\n", user)
 	user.Password = hashAndSalt([]byte(user.Password))
 	u.connection.Save(&user)
 	return user
@@ -48,10 +48,8 @@ func (u *userConnection) Update(user entity.User) entity.User {
 }
 
 func (u *userConnection) VerifyCredential(email string, password string) interface{} {
-	var user entity.User
-
 	res := u.FindByEmail(email)
-	_, ok := res.(entity.User)
+	user, ok := res.(entity.User)
 
 	comparedPass := comparePassword([]byte(user.Password), []byte(password))
 

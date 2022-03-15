@@ -4,9 +4,12 @@ import (
 	"github.com/amirphl/go-gin-gorm-postgres/dto"
 	"github.com/amirphl/go-gin-gorm-postgres/entity"
 	"github.com/amirphl/go-gin-gorm-postgres/helper"
+	"github.com/amirphl/go-gin-gorm-postgres/repository"
 	"github.com/amirphl/go-gin-gorm-postgres/service"
 	"github.com/gin-gonic/gin"
+	"github.com/mashingan/smapping"
 	"gopkg.in/validator.v2"
+	"log"
 	"net/http"
 )
 
@@ -17,8 +20,8 @@ type AuthController interface {
 }
 
 type authController struct {
-	authSer service.AuthService
-	jwtSer  service.JWTService
+	userRepo repository.UserRepository
+	jwtSer   service.JWTService
 }
 
 func (a *authController) Login(ctx *gin.Context) {
@@ -36,7 +39,7 @@ func (a *authController) Login(ctx *gin.Context) {
 		return
 	}
 
-	res := a.authSer.VerifyCredential(loginDTO.Email, loginDTO.Password)
+	res := a.userRepo.VerifyCredential(loginDTO.Email, loginDTO.Password)
 
 	if user, ok := res.(entity.User); ok {
 		genToken := a.jwtSer.GenerateToken(user.ID)
@@ -65,7 +68,7 @@ func (a *authController) Register(ctx *gin.Context) {
 		return
 	}
 
-	res := a.authSer.FindUserByEmail(registerDTO.Email)
+	res := a.userRepo.FindByEmail(registerDTO.Email)
 
 	if _, ok := res.(entity.User); ok {
 		resp := helper.BuildErrResp("Duplicate email", "", nil)
@@ -73,7 +76,16 @@ func (a *authController) Register(ctx *gin.Context) {
 		return
 	}
 
-	newUser := a.authSer.CreateUser(registerDTO)
+	userToCreate := entity.User{}
+
+	if err := smapping.FillStruct(&userToCreate, smapping.MapFields(&registerDTO)); err != nil {
+		log.Printf("failed to map RegisterDTO to User: \t %v \t %v \t %T", registerDTO, err, err)
+		resp := helper.BuildErrResp("Something went wrong", err.Error(), nil)
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, resp)
+		return
+	}
+
+	newUser := a.userRepo.Create(userToCreate)
 	genToken := a.jwtSer.GenerateToken(newUser.ID)
 	newUser.Token = genToken
 	resp := helper.BuildResp("register OK!", newUser)
@@ -81,9 +93,9 @@ func (a *authController) Register(ctx *gin.Context) {
 }
 
 // CreateAuthController ...
-func CreateAuthController(authSer service.AuthService, jwtSer service.JWTService) AuthController {
+func CreateAuthController(userRepo repository.UserRepository, jwtSer service.JWTService) AuthController {
 	return &authController{
-		authSer,
+		userRepo,
 		jwtSer,
 	}
 }
