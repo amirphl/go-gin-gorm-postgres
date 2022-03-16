@@ -6,5 +6,5 @@ type Book struct {
 	Title  string `gorm:"type:varchar(255)"	json:"title"`
 	Desc   string `gorm:"type:text"	json:"description"`
 	UserID uint64 `gorm:"not null"	json:"-"`
-	User   User   `gorm:"foreignkey:UserID;constraint:onUpdate:CASCADE,onDelete:SET_NULL" json:"user"`
+	User   User   `gorm:"foreignkey:UserID;constraint:onUpdate:CASCADE,onDelete:SET NULL" json:"user"`
 }
