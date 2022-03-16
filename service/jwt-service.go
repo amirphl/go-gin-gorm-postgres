@@ -2,15 +2,18 @@ package service
 
 import (
 	"fmt"
-	"github.com/golang-jwt/jwt"
 	"os"
 	"time"
+
+	"github.com/amirphl/go-gin-gorm-postgres/repository"
+	"github.com/golang-jwt/jwt"
 )
 
 // JWTService ...
 type JWTService interface {
 	GenerateToken(userID uint64) string
 	ValidateToken(token string) (*jwt.Token, error)
+	ExtractUser(token string, userRepo repository.UserRepository) interface{}
 }
 
 type jwtCustomClaim struct {
@@ -53,6 +56,18 @@ func (j *jwtService) ValidateToken(token string) (*jwt.Token, error) {
 	}
 
 	return jwt.Parse(token, f)
+}
+
+func (j *jwtService) ExtractUser(token string, userRepo repository.UserRepository) interface{} {
+	t, err := j.ValidateToken(token)
+
+	if err != nil {
+		return nil
+	}
+
+	userID := (uint64)(t.Claims.(jwt.MapClaims)["user_id"].(float64))
+
+	return userRepo.FindByID(userID)
 }
 
 // CreateJWTService ...
