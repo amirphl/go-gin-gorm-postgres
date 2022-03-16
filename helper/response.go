@@ -2,6 +2,9 @@ package helper
 
 import "strings"
 
+// DefaultErrMsg ...
+var DefaultErrMsg = "Failed to process the request"
+
 // Response representation
 type Response struct {
 	Message string      `json:"message"`
