@@ -2,11 +2,12 @@ package config
 
 import (
 	"fmt"
+	"os"
+
 	"github.com/amirphl/go-gin-gorm-postgres/entity"
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"os"
 )
 
 // SetupDB is SetupDB :))
@@ -31,7 +32,8 @@ func SetupDB() *gorm.DB {
 		panic("failed to connect to the database.")
 	}
 
-	db.AutoMigrate(&entity.User{}, &entity.Book{})
+	db.AutoMigrate(&entity.User{})
+	db.AutoMigrate(&entity.Book{})
 
 	return db
 }
