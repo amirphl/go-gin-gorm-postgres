@@ -1,6 +1,9 @@
 package controller
 
 import (
+	"log"
+	"net/http"
+
 	"github.com/amirphl/go-gin-gorm-postgres/dto"
 	"github.com/amirphl/go-gin-gorm-postgres/entity"
 	"github.com/amirphl/go-gin-gorm-postgres/helper"
@@ -10,8 +13,6 @@ import (
 	"github.com/golang-jwt/jwt"
 	"github.com/mashingan/smapping"
 	"gopkg.in/validator.v2"
-	"log"
-	"net/http"
 )
 
 // UserController ...
