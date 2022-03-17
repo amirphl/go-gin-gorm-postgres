@@ -1,6 +1,13 @@
 # Warm-up exercise with Gin and GORM
  After learning the fundemental of the Golang, I was planning to play with the webframeworks of the Golang. I chose Gin (There are other web frameworks that I haven't compared yet). Unlike Django, Gin doesn't have a built-in ORM, therfore, I selected GORM as the ORM. In this repo, I have implemented a very simple REST service with two entities (models): `User` and `Book`.  The whole of the project is nothing but a bunch of requests which create and modifies the users and the books. If you are interested, you can see my commits from the `Initial commit` then practice yourself.  
 
+## Table of content
+1. [API doc](#api-doc)
+	1. [Auth](#auth)
+	2. [User](#user)
+	3. [Book](#book)
+2. [TODO](#todo)
+
 ## API doc
 ### Auth
 #### register 201
